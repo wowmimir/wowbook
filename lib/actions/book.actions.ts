@@ -12,7 +12,7 @@ export const createBook = async(data : CreateBook)=>{
         await connectToDatabase()
 
         const slug = generateSlug(data.title)
-        const existingBook = Book.findOne({slug}).lean()
+        const existingBook = await Book.findOne({slug}).lean()
 
         if(existingBook){
             return {
@@ -95,3 +95,19 @@ export const checkBookExists = async (title: string) => {
     }
 }
 
+export const getAllBooks = async()=>{
+    try{
+        await connectToDatabase()
+        const books = await Book.find().sort({createdAt : -1}).lean()
+
+        return {
+            success : true, data : serializeData(books)
+        }
+
+    }catch(error){
+        console.error('Error connecting to database')
+        return {
+            success : false, error : error
+        }
+    }
+}
